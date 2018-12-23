@@ -1,1 +1,1 @@
-web: gunicorn djSetMatcher:app
+web: gunicorn --bind 0.0.0.0:80 djSetMatcher:app
