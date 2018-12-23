@@ -1,1 +1,1 @@
-web: bin/start-nginx gunicorn djSetMatcher:app
+web: gunicorn djSetMatcher:app
