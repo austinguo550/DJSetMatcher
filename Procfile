@@ -1,2 +1,1 @@
-export FLASK_APP=djSetMatcher
-flask run
+web: gunicorn app:app
