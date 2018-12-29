@@ -11,7 +11,7 @@ class Room:
     def __init__(self):
         print("This is the constructor method.")
 
-    def calculate_distance(song1, song2):
+    def calculate_distance(self, song1, song2):
         features_song1 = song1.features
         features_song2 = song2.features
 
@@ -20,13 +20,13 @@ class Room:
             distance = distance + (song1[i] - song2[i])**2
         return distance ** (1/2.0)
 
-    def add_song(song):
-        queue.add(song)
+    def add_song(self, song):
+        self.queue.add(song)
 
-    def accept_song(song):
-        queue.remove(song)
-        playlist.add(song)
+    def accept_song(self, song):
+        self.queue.remove(song)
+        self.playlist.add(song)
 
-    def played_song(song):
-    	playlist.remove(song)
-    	already_played.add(song)
+    def played_song(self, song):
+    	self.playlist.remove(song)
+    	self.already_played.add(song)

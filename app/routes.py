@@ -5,6 +5,8 @@ import config
 import json
 from app import Room
 from app import Song
+from flask import request
+
 
 
 room = None
@@ -60,7 +62,7 @@ def addSong():
 		return 'False'
 
 	# Extract song name from text message
-	song_name = flask.request.values.get('Body')
+	song_name = request.args.get('Body')
 	print("Received song {}, extracting information from Spotify API".format(song_name))
 
 	# Search for the song ID on Spotify
@@ -85,6 +87,7 @@ def addSong():
 		# construct a features list representing relevant features
 		features = [features_response_json[x] for x in features_response_json if x in relevant_features]
 
-	song = Song(song_id, song_name, features)
+	song = Song.Song(song_id, song_name, features)
 	room.add_song(song)
+	return 'True'
 
