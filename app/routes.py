@@ -13,7 +13,7 @@ room = None
 access_token = None
 
 relevant_features = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
-'instrumentalness', 'liveness', 'valence', 'tempo', 'type']
+'instrumentalness', 'liveness', 'valence', 'tempo']
 
 @app.route('/')
 @app.route('/index')
@@ -55,6 +55,16 @@ def deleteRoom():
 	global access_token
 	access_token = None
 
+@app.route('/acceptSong', methods=["POST"])
+def acceptSong():
+	if not room:
+		return 'False'
+	song_name = request.args.get('Body')
+	song = room.get_song_from_name(song_name)
+	room.accept_song(song)
+	print(room.playlist)
+	return 'True'
+
 
 @app.route('/addSong', methods=["POST"])
 def addSong():
@@ -85,9 +95,11 @@ def addSong():
 	if features_response.status_code == 200:
 		features_response_json = json.loads(features_response.text)
 		# construct a features list representing relevant features
-		features = [features_response_json[x] for x in features_response_json if x in relevant_features]
+		features = [float(features_response_json[x]) for x in features_response_json if x in relevant_features]
+		# print(features_response_json)
 
 	song = Song.Song(song_id, song_name, features)
 	room.add_song(song)
+	print(room.queue)
 	return 'True'
 
