@@ -3,6 +3,8 @@ import requests
 import base64
 import config
 import json
+from app import Room
+from app import Song
 
 
 room = None
@@ -22,7 +24,7 @@ def index():
 def createRoom():
 	# Initialize room
 	global room
-	room = Room()
+	room = Room.Room()
 
 	# Get access token for Spotify room
 	client_credentials = base64.b64encode(bytes("{0}:{1}".format(config.SPOTIFY_CLIENT_ID, 
@@ -55,7 +57,7 @@ def deleteRoom():
 @app.route('/addSong', methods=["POST"])
 def addSong():
 	if not room:
-		return False
+		return 'False'
 
 	# Extract song name from text message
 	song_name = flask.request.values.get('Body')

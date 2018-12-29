@@ -1,11 +1,11 @@
-import Song
+from app import Song
 import math
 
 
 class Room:
 
-	queue = set()
-	already_played = set()
+    queue = set()
+    already_played = set()
     playlist = set()
 
     def __init__(self):
