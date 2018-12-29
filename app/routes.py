@@ -67,7 +67,7 @@ def addSong():
 		'Content-Type': 'application/json'
 	}
 	params = {
-		'q': song_name.
+		'q': song_name,
 		'type': 'track,artist',
 		'limit': '1'
 	}
