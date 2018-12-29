@@ -27,23 +27,23 @@ def createRoom():
 	room = Room.Room()
 
 	# Get access token for Spotify room
-	client_credentials = base64.b64encode(bytes("{0}:{1}".format(config.SPOTIFY_CLIENT_ID, 
-												config.SPOTIFY_CLIENT_SECRET)))
+	client_credentials = base64.b64encode(bytes("{0}:{1}".format(config.SPOTIFY_CLIENT_ID, config.SPOTIFY_CLIENT_SECRET), 'utf-8'))
 	headers = {
-		'Authorization': 'Basic {}'.format(client_credentials),
-		'Content-Type': 'application/json'
+		'Authorization': 'Basic {}'.format(client_credentials.decode('utf-8'))
 	}
 	data = {
 		'grant_type': 'client_credentials'
 	}
-	response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=json.dumps(data))
+	response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
 	if response.status_code == 200:
 		response_json = json.loads(response.text)
 		global access_token
-		access_token = response_json.body.access_token
-		return True
+		access_token = response_json['access_token']
+		return 'True'
 
-	return False
+	print(headers)
+
+	return 'False'
 
 
 @app.route('/deleteRoom')
@@ -65,8 +65,7 @@ def addSong():
 
 	# Search for the song ID on Spotify
 	headers = {
-		'Authorization': 'Bearer {}'.format(access_token),
-		'Content-Type': 'application/json'
+		'Authorization': 'Bearer {}'.format(access_token)
 	}
 	params = {
 		'q': song_name,
