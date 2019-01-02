@@ -24,6 +24,8 @@ def index():
 # first time frontend is opened on a browser should run /createRoom
 @app.route('/createRoom')
 def createRoom():
+	print("Create room called.")
+
 	# Initialize room
 	global room
 	room = Room.Room()
@@ -50,6 +52,8 @@ def createRoom():
 
 @app.route('/deleteRoom')
 def deleteRoom():
+	print("Delete room called.")
+
 	global room
 	room = None
 	global access_token
@@ -57,9 +61,11 @@ def deleteRoom():
 
 @app.route('/acceptSong', methods=["POST"])
 def acceptSong():
+	print("Accept song called.")
+
 	if not room:
 		return 'False'
-	song_name = request.args.get('Body')
+	song_name = request.form.get('Body')
 	song = room.get_song_from_name(song_name)
 	room.accept_song(song)
 	print(room.playlist)
@@ -68,11 +74,13 @@ def acceptSong():
 
 @app.route('/addSong', methods=["POST"])
 def addSong():
+	print("Add song called.")
+
 	if not room:
 		return 'False'
 
 	# Extract song name from text message
-	song_name = request.args.get('Body')
+	song_name = request.form.get('Body')
 	print("Received song {}, extracting information from Spotify API".format(song_name))
 
 	# Search for the song ID on Spotify
@@ -85,21 +93,43 @@ def addSong():
 		'limit': '1'
 	}
 	song_response = requests.get('https://api.spotify.com/v1/search', headers=headers, params=params)
-	if song_response.status_code == 200:
-		song_response_json = json.loads(song_response.text)
-		track = song_response_json['tracks']['items'][0]
-		song_id = track['id']
+
+	print (json.loads(song_response.text))
+	if song_response.status_code != 200:
+		return 'False'
+
+	song_response_json = json.loads(song_response.text)
+	track = song_response_json['tracks']['items'][0]
+	song_id = track['id']
 
 	# Get features vector for song from Spotify
 	features_response = requests.get('https://api.spotify.com/v1/audio-features/{}'.format(song_id), headers=headers)
-	if features_response.status_code == 200:
-		features_response_json = json.loads(features_response.text)
-		# construct a features list representing relevant features
-		features = [float(features_response_json[x]) for x in features_response_json if x in relevant_features]
-		# print(features_response_json)
+	if features_response.status_code != 200:
+		return 'False'
+
+	features_response_json = json.loads(features_response.text)
+	# construct a features list representing relevant features
+	features = [float(features_response_json[x]) for x in features_response_json if x in relevant_features]
+	# print(features_response_json)
 
 	song = Song.Song(song_id, song_name, features)
 	room.add_song(song)
 	print(room.queue)
 	return 'True'
 
+
+@app.route('/getRoom')
+def getRoom():
+	print("Get room called.")
+
+	room_json = {}
+	room_json['queue'] = list([x.__dict__ for x in room.queue])
+	room_json['playlist'] = list([x.__dict__ for x in room.playlist])
+	room_json['alreadyPlayed'] = list(x.__dict__ for x in room.already_played)
+
+	res = json.dumps(room_json)
+	response = app.response_class(
+		response=res, 
+		status=200, 
+		mimetype='application/json')
+	return response
